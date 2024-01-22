@@ -14,9 +14,9 @@ import { isAxiosError } from "axios";
 import { useSession } from "@/contexts/Session";
 import { useRouter } from "next/navigation";
 
-interface UserAuthFormProps extends React.HTMLAttributes<HTMLDivElement> {}
+interface UserSignUpFormProps extends React.HTMLAttributes<HTMLDivElement> {}
 
-export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
+export function UserSignUpForm({ className, ...props }: UserSignUpFormProps) {
   const router = useRouter();
   const { session, setSession } = useSession();
 

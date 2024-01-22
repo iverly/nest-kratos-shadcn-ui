@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { UserAuthForm } from "@/app/auth/signup/components/user-auth-form";
+import { UserSignUpForm } from "@/app/auth/signup/components/user-signup-form";
 
 export default function Login() {
   return (
@@ -15,7 +15,7 @@ export default function Login() {
           </Link>
         </p>
       </div>
-      <UserAuthForm />
+      <UserSignUpForm />
       <p className="px-8 text-center text-sm text-muted-foreground">
         By clicking continue, you agree to our{" "}
         <Link

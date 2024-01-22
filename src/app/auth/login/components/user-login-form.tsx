@@ -14,9 +14,9 @@ import { Message } from "@/components/auth/message";
 import { useSession } from "@/contexts/Session";
 import { useRouter } from "next/navigation";
 
-interface UserAuthFormProps extends React.HTMLAttributes<HTMLDivElement> {}
+interface UserLoginFormProps extends React.HTMLAttributes<HTMLDivElement> {}
 
-export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
+export function UserLoginForm({ className, ...props }: UserLoginFormProps) {
   const router = useRouter();
   const { session, setSession } = useSession();
 
