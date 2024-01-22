@@ -12,7 +12,7 @@ import { UpdateVerificationFlowBody, VerificationFlow } from "@ory/client";
 import { filterNodesByGroups } from "@ory/integrations/ui";
 import { isAxiosError } from "axios";
 import { useSession } from "@/contexts/Session";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 
 interface UserVerificationFormProps
   extends React.HTMLAttributes<HTMLDivElement> {}
@@ -23,6 +23,7 @@ export function UserVerificationForm({
 }: UserVerificationFormProps) {
   const router = useRouter();
   const session = useSession();
+  const searchParams = useSearchParams();
 
   const [flow, setFlow] = React.useState<VerificationFlow | undefined>(
     undefined
@@ -67,8 +68,12 @@ export function UserVerificationForm({
 
       // step after user enters their code
       if (data.state === "passed_challenge") {
-        session.setEmailVerified(true);
-        router.push("/");
+        if (session.data) {
+          session.setEmailVerified(true);
+          router.push("/");
+        } else {
+          setFlow(data);
+        }
       }
     } catch (err: unknown) {
       if (!isAxiosError(err)) {
@@ -87,10 +92,29 @@ export function UserVerificationForm({
   }
 
   React.useEffect(() => {
-    frontend.createBrowserVerificationFlow().then(({ data: flow }) => {
-      setFlow(flow);
-    });
-  }, []);
+    const flowId = searchParams.get("flow");
+
+    if (flowId) {
+      frontend
+        .getVerificationFlow({ id: flowId })
+        .then(({ data: flow }) => {
+          setFlow(flow);
+        })
+        .catch((err: unknown) => {
+          if (!isAxiosError(err)) {
+            throw err;
+          }
+
+          if (err.response?.status === 404 || err.response?.status === 403) {
+            router.push("/auth/verification");
+          }
+        });
+    } else {
+      frontend.createBrowserVerificationFlow().then(({ data: flow }) => {
+        setFlow(flow);
+      });
+    }
+  }, [router, searchParams]);
 
   if (!flow) {
     return (

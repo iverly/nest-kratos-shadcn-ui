@@ -1,6 +1,7 @@
 import {
   ExclamationTriangleIcon,
   InfoCircledIcon,
+  CheckCircledIcon,
 } from "@radix-ui/react-icons";
 
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
@@ -15,6 +16,10 @@ export function Message({ text }: MessageProps) {
     return <Info text={text} />;
   }
 
+  if (text.type === "success") {
+    return <Success text={text} />;
+  }
+
   if (text.type === "error") {
     return <Error text={text} />;
   }
@@ -27,6 +32,16 @@ const Info = ({ text }: MessageProps) => {
     <Alert>
       <InfoCircledIcon className="h-4 w-4" />
       <AlertTitle>Info</AlertTitle>
+      <AlertDescription>{text.text}</AlertDescription>
+    </Alert>
+  );
+};
+
+const Success = ({ text }: MessageProps) => {
+  return (
+    <Alert variant="success">
+      <CheckCircledIcon className="h-4 w-4" />
+      <AlertTitle>Success</AlertTitle>
       <AlertDescription>{text.text}</AlertDescription>
     </Alert>
   );

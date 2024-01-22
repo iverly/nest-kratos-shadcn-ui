@@ -54,13 +54,6 @@ export const SessionProvider = ({
     }
   }, [data]);
 
-  // redirect to the verification page if the user hasn't verified their email
-  React.useEffect(() => {
-    if (!emailVerified && pathname !== "/auth/verification") {
-      router.push("/auth/verification");
-    }
-  }, [emailVerified, router, pathname]);
-
   const destroy = React.useCallback(() => {
     frontend
       .createBrowserLogoutFlow()

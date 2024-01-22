@@ -49,13 +49,27 @@ export function UserSignUpForm({ className, ...props }: UserSignUpFormProps) {
     }
 
     try {
+      // update the registration flow
       const { data } = await frontend.updateRegistrationFlow({
         flow: flow!.id,
         updateRegistrationFlowBody: body,
       });
 
+      // update the session if it exists
       if (data.session) {
         session.set(data.session);
+      }
+
+      // redirect to the next step
+      if (data.continue_with && data.continue_with[0]) {
+        const next = data.continue_with[0];
+
+        if (next.action === "show_verification_ui") {
+          router.push(`/auth/verification?flow=${next.flow.id}`);
+        }
+      } else {
+        // redirect to the home page if there are no more steps
+        router.push("/");
       }
     } catch (err: unknown) {
       if (!isAxiosError(err)) {
@@ -73,17 +87,19 @@ export function UserSignUpForm({ className, ...props }: UserSignUpFormProps) {
     }
   }
 
+  // create the registration flow
   React.useEffect(() => {
     frontend.createBrowserRegistrationFlow().then(({ data: flow }) => {
       setFlow(flow);
     });
   }, []);
 
+  // redirect to the home page if the user is already logged in
   React.useEffect(() => {
-    if (session.data) {
+    if (session.data && !flow) {
       router.push("/");
     }
-  }, [session.data, router]);
+  }, [session.data, router, flow]);
 
   if (!flow) {
     return (
