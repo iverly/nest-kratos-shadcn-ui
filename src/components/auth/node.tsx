@@ -6,6 +6,8 @@ import { Button } from "@/components/ui/button";
 import { Icons } from "@/components/icons";
 import { isUiNodeInputAttributes, getNodeLabel } from "@ory/integrations/ui";
 
+import classNames from "classnames";
+
 interface NodeProps extends React.HTMLAttributes<HTMLDivElement> {
   node: UiNode;
   loading?: boolean;
@@ -27,10 +29,16 @@ const InputNode = ({ node, loading }: NodeProps) => {
   const attributes: UiNodeInputAttributes =
     node.attributes as UiNodeInputAttributes;
 
+  const errors = node.messages?.filter((message) => message.type === "error");
+
   return (
     <div className="grid gap-1">
       <Label className="sr-only">{getNodeLabel(node)}</Label>
+
       <Input
+        className={classNames({
+          "border-2 border-destructive": errors?.length,
+        })}
         name={attributes.name}
         type={attributes.type}
         autoComplete={
@@ -43,6 +51,12 @@ const InputNode = ({ node, loading }: NodeProps) => {
         disabled={attributes.disabled || loading}
         placeholder={attributes.name}
       />
+
+      {errors?.map((message, index) => (
+        <p key={index} className={"text-[0.8rem] font-medium text-destructive"}>
+          {message.text}
+        </p>
+      ))}
     </div>
   );
 };
