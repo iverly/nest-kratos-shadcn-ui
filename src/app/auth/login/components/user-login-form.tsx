@@ -18,7 +18,7 @@ interface UserLoginFormProps extends React.HTMLAttributes<HTMLDivElement> {}
 
 export function UserLoginForm({ className, ...props }: UserLoginFormProps) {
   const router = useRouter();
-  const { session, setSession } = useSession();
+  const session = useSession();
 
   const [flow, setFlow] = React.useState<LoginFlow | undefined>(undefined);
   const [isLoading, setIsLoading] = React.useState<boolean>(false);
@@ -51,7 +51,7 @@ export function UserLoginForm({ className, ...props }: UserLoginFormProps) {
       });
 
       if (data.session) {
-        setSession(data.session);
+        session.set(data.session);
       }
     } catch (err: unknown) {
       if (!isAxiosError(err)) {
@@ -76,10 +76,10 @@ export function UserLoginForm({ className, ...props }: UserLoginFormProps) {
   }, []);
 
   React.useEffect(() => {
-    if (session) {
+    if (session.data) {
       router.push("/");
     }
-  }, [session, router]);
+  }, [session.data, router]);
 
   if (!flow) {
     return (

@@ -18,7 +18,7 @@ interface UserSignUpFormProps extends React.HTMLAttributes<HTMLDivElement> {}
 
 export function UserSignUpForm({ className, ...props }: UserSignUpFormProps) {
   const router = useRouter();
-  const { session, setSession } = useSession();
+  const session = useSession();
 
   const [flow, setFlow] = React.useState<RegistrationFlow | undefined>(
     undefined
@@ -55,7 +55,7 @@ export function UserSignUpForm({ className, ...props }: UserSignUpFormProps) {
       });
 
       if (data.session) {
-        setSession(data.session);
+        session.set(data.session);
       }
     } catch (err: unknown) {
       if (!isAxiosError(err)) {
@@ -80,10 +80,10 @@ export function UserSignUpForm({ className, ...props }: UserSignUpFormProps) {
   }, []);
 
   React.useEffect(() => {
-    if (session) {
+    if (session.data) {
       router.push("/");
     }
-  }, [session, router]);
+  }, [session.data, router]);
 
   if (!flow) {
     return (

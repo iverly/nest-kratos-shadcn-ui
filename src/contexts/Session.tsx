@@ -6,13 +6,13 @@ import { Session } from "@ory/client";
 import { frontend } from "@/lib/ory";
 
 interface SessionContextProps {
-  session: Session | undefined;
-  setSession: React.Dispatch<React.SetStateAction<Session | undefined>>;
+  data: Session | undefined;
+  set: React.Dispatch<React.SetStateAction<Session | undefined>>;
 }
 
 export const SessionContext = React.createContext<SessionContextProps>({
-  session: undefined,
-  setSession: () => {},
+  data: undefined,
+  set: () => {},
 });
 
 export const SessionProvider = ({
@@ -20,16 +20,16 @@ export const SessionProvider = ({
 }: {
   children: React.ReactNode;
 }) => {
-  const [session, setSession] = React.useState<Session | undefined>(undefined);
+  const [data, setData] = React.useState<Session | undefined>(undefined);
 
   React.useEffect(() => {
     frontend.toSession().then(({ data: session }) => {
-      setSession(session);
+      setData(session);
     });
   }, []);
 
   return (
-    <SessionContext.Provider value={{ session, setSession }}>
+    <SessionContext.Provider value={{ data, set: setData }}>
       {children}
     </SessionContext.Provider>
   );
