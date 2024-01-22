@@ -5,17 +5,22 @@ import React from "react";
 import { Session } from "@ory/client";
 import { frontend } from "@/lib/ory";
 import axios from "axios";
+import { usePathname, useRouter } from "next/navigation";
 
 interface SessionContextProps {
   data: Session | undefined;
   set: React.Dispatch<React.SetStateAction<Session | undefined>>;
   destroy: () => void;
+  emailVerified: boolean;
+  setEmailVerified: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 export const SessionContext = React.createContext<SessionContextProps>({
   data: undefined,
   set: () => {},
   destroy: () => {},
+  emailVerified: false,
+  setEmailVerified: () => {},
 });
 
 export const SessionProvider = ({
@@ -23,13 +28,38 @@ export const SessionProvider = ({
 }: {
   children: React.ReactNode;
 }) => {
-  const [data, setData] = React.useState<Session | undefined>(undefined);
+  const router = useRouter();
+  const pathname = usePathname();
 
+  const [data, setData] = React.useState<Session | undefined>(undefined);
+  const [emailVerified, setEmailVerified] = React.useState<boolean>(true);
+
+  // get the session data
   React.useEffect(() => {
     frontend.toSession().then(({ data: session }) => {
       setData(session);
     });
   }, []);
+
+  // check if the user has verified their email
+  React.useEffect(() => {
+    if (data) {
+      if (data.identity?.verifiable_addresses?.length) {
+        setEmailVerified(
+          data.identity?.verifiable_addresses?.some(
+            (address) => address.verified
+          )
+        );
+      }
+    }
+  }, [data]);
+
+  // redirect to the verification page if the user hasn't verified their email
+  React.useEffect(() => {
+    if (!emailVerified && pathname !== "/auth/verification") {
+      router.push("/auth/verification");
+    }
+  }, [emailVerified, router, pathname]);
 
   const destroy = React.useCallback(() => {
     frontend
@@ -48,7 +78,9 @@ export const SessionProvider = ({
   }, []);
 
   return (
-    <SessionContext.Provider value={{ data, set: setData, destroy }}>
+    <SessionContext.Provider
+      value={{ data, set: setData, destroy, emailVerified, setEmailVerified }}
+    >
       {children}
     </SessionContext.Provider>
   );

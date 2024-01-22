@@ -47,7 +47,6 @@ const InputNode = ({ node, loading }: NodeProps) => {
             : ""
         }
         defaultValue={attributes.value}
-        required={attributes.required}
         disabled={attributes.disabled || loading}
         placeholder={attributes.name}
       />
