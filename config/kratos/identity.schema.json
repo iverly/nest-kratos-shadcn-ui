@@ -1,32 +1,33 @@
 {
-  "$id": "https://schemas.ory.sh/presets/kratos/identity.username.schema.json",
-  "title": "Person",
+  "$id": "https://dev.nx-next-nest-prisma-ory-template.com/config/kratos/identity.schema.json",
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "User",
   "type": "object",
   "properties": {
     "traits": {
       "type": "object",
       "properties": {
-        "username": {
+        "email": {
           "type": "string",
-          "title": "Username",
-          "maxLength": 100,
+          "format": "email",
+          "title": "Email",
           "ory.sh/kratos": {
             "credentials": {
               "password": {
                 "identifier": true
-              },
-              "webauthn": {
-                "identifier": true
-              },
-              "totp": {
-                "account_name": true
               }
+            },
+            "verification": {
+              "via": "email"
+            },
+            "recovery": {
+              "via": "email"
             }
           }
         }
       },
       "required": [
-        "username"
+        "email"
       ],
       "additionalProperties": false
     }
