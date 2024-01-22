@@ -11,10 +11,15 @@ import { LoginFlow, UpdateLoginFlowBody } from "@ory/client";
 import { filterNodesByGroups } from "@ory/integrations/ui";
 import { isAxiosError } from "axios";
 import { Message } from "@/components/auth/message";
+import { useSession } from "@/contexts/Session";
+import { useRouter } from "next/navigation";
 
 interface UserAuthFormProps extends React.HTMLAttributes<HTMLDivElement> {}
 
 export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
+  const router = useRouter();
+  const { session, setSession } = useSession();
+
   const [flow, setFlow] = React.useState<LoginFlow | undefined>(undefined);
   const [isLoading, setIsLoading] = React.useState<boolean>(false);
 
@@ -40,10 +45,14 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
     }
 
     try {
-      await frontend.updateLoginFlow({
+      const { data } = await frontend.updateLoginFlow({
         flow: flow!.id,
         updateLoginFlowBody: body,
       });
+
+      if (data.session) {
+        setSession(data.session);
+      }
     } catch (err: unknown) {
       if (!isAxiosError(err)) {
         throw err;
@@ -65,6 +74,12 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
       setFlow(flow);
     });
   }, []);
+
+  React.useEffect(() => {
+    if (session) {
+      router.push("/");
+    }
+  }, [session, router]);
 
   if (!flow) {
     return (
